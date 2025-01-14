@@ -11,6 +11,7 @@ class NodeType(StrEnum):
     CODE = "code"
     TEMPLATE_TRANSFORM = "template-transform"
     QUESTION_CLASSIFIER = "question-classifier"
+    TEXT_TO_3D = "text-to-3d"
     HTTP_REQUEST = "http-request"
     TOOL = "tool"
     VARIABLE_AGGREGATOR = "variable-aggregator"

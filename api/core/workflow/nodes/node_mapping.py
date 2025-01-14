@@ -14,6 +14,7 @@ from core.workflow.nodes.list_operator import ListOperatorNode
 from core.workflow.nodes.llm import LLMNode
 from core.workflow.nodes.parameter_extractor import ParameterExtractorNode
 from core.workflow.nodes.question_classifier import QuestionClassifierNode
+from core.workflow.nodes.text_to_3d import TextTo3DNode
 from core.workflow.nodes.start import StartNode
 from core.workflow.nodes.template_transform import TemplateTransformNode
 from core.workflow.nodes.tool import ToolNode
@@ -59,6 +60,10 @@ NODE_TYPE_CLASSES_MAPPING: Mapping[NodeType, Mapping[str, type[BaseNode]]] = {
     NodeType.QUESTION_CLASSIFIER: {
         LATEST_VERSION: QuestionClassifierNode,
         "1": QuestionClassifierNode,
+    },
+    NodeType.TEXT_TO_3D: {
+        LATEST_VERSION: TextTo3DNode,
+        "1": TextTo3DNode,
     },
     NodeType.HTTP_REQUEST: {
         LATEST_VERSION: HttpRequestNode,
