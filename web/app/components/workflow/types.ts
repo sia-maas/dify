@@ -35,6 +35,7 @@ export enum BlockEnum {
   ListFilter = 'list-operator',
   IterationStart = 'iteration-start',
   Assigner = 'assigner', // is now named as VariableAssigner
+  TextTo3D = 'text-to-3d',
 }
 
 export enum ControlMode {

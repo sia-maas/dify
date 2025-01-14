@@ -12,6 +12,8 @@ import KnowledgeRetrievalNode from './knowledge-retrieval/node'
 import KnowledgeRetrievalPanel from './knowledge-retrieval/panel'
 import QuestionClassifierNode from './question-classifier/node'
 import QuestionClassifierPanel from './question-classifier/panel'
+import TextTo3DNode from './text-to-3d/node'
+import TextTo3DPanel from './text-to-3d/panel'
 import IfElseNode from './if-else/node'
 import IfElsePanel from './if-else/panel'
 import CodeNode from './code/node'
@@ -42,6 +44,7 @@ export const NodeComponentMap: Record<string, ComponentType<any>> = {
   [BlockEnum.LLM]: LLMNode,
   [BlockEnum.KnowledgeRetrieval]: KnowledgeRetrievalNode,
   [BlockEnum.QuestionClassifier]: QuestionClassifierNode,
+  [BlockEnum.TextTo3D]: TextTo3DNode,
   [BlockEnum.IfElse]: IfElseNode,
   [BlockEnum.Code]: CodeNode,
   [BlockEnum.TemplateTransform]: TemplateTransformNode,
@@ -63,6 +66,7 @@ export const PanelComponentMap: Record<string, ComponentType<any>> = {
   [BlockEnum.LLM]: LLMPanel,
   [BlockEnum.KnowledgeRetrieval]: KnowledgeRetrievalPanel,
   [BlockEnum.QuestionClassifier]: QuestionClassifierPanel,
+  [BlockEnum.TextTo3D]: TextTo3DPanel,
   [BlockEnum.IfElse]: IfElsePanel,
   [BlockEnum.Code]: CodePanel,
   [BlockEnum.TemplateTransform]: TemplateTransformPanel,

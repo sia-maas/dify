@@ -16,6 +16,7 @@ import {
   Llm,
   ParameterExtractor,
   QuestionClassifier,
+  TextTo3D,
   TemplatingTransform,
   VariableX,
 } from '@/app/components/base/icons/src/vender/workflow'
@@ -43,6 +44,7 @@ const getIcon = (type: BlockEnum, className: string) => {
     [BlockEnum.Answer]: <Answer className={className} />,
     [BlockEnum.KnowledgeRetrieval]: <KnowledgeRetrieval className={className} />,
     [BlockEnum.QuestionClassifier]: <QuestionClassifier className={className} />,
+    [BlockEnum.TextTo3D]: <TextTo3D className={className} />,
     [BlockEnum.TemplateTransform]: <TemplatingTransform className={className} />,
     [BlockEnum.VariableAssigner]: <VariableX className={className} />,
     [BlockEnum.VariableAggregator]: <VariableX className={className} />,
@@ -66,6 +68,7 @@ const ICON_CONTAINER_BG_COLOR_MAP: Record<string, string> = {
   [BlockEnum.Answer]: 'bg-util-colors-warning-warning-500',
   [BlockEnum.KnowledgeRetrieval]: 'bg-util-colors-green-green-500',
   [BlockEnum.QuestionClassifier]: 'bg-util-colors-green-green-500',
+  [BlockEnum.TextTo3D]: 'bg-util-colors-blue-blue-500',
   [BlockEnum.TemplateTransform]: 'bg-util-colors-blue-blue-500',
   [BlockEnum.VariableAssigner]: 'bg-util-colors-blue-blue-500',
   [BlockEnum.VariableAggregator]: 'bg-util-colors-blue-blue-500',

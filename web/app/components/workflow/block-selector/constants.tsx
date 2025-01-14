@@ -84,6 +84,11 @@ export const BLOCKS: Block[] = [
     type: BlockEnum.ListFilter,
     title: 'List Filter',
   },
+  {
+    classification: BlockClassificationEnum.IntelligentDesign,
+    type: BlockEnum.TextTo3D,
+    title: 'Text To 3D',
+  },
 ]
 
 export const BLOCK_CLASSIFICATIONS: string[] = [
@@ -92,4 +97,5 @@ export const BLOCK_CLASSIFICATIONS: string[] = [
   BlockClassificationEnum.Logic,
   BlockClassificationEnum.Transform,
   BlockClassificationEnum.Utilities,
+  BlockClassificationEnum.IntelligentDesign,
 ]

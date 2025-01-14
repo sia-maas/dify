@@ -35,6 +35,7 @@ import {
 } from './constants'
 import { CUSTOM_ITERATION_START_NODE } from './nodes/iteration-start/constants'
 import type { QuestionClassifierNodeType } from './nodes/question-classifier/types'
+import type { TextTo3DNodeType } from './nodes/text-to-3d/types'
 import type { IfElseNodeType } from './nodes/if-else/types'
 import { branchNameCorrect } from './nodes/if-else/utils'
 import type { ToolNodeType } from './nodes/tool/types'
@@ -273,6 +274,12 @@ export const initialNodes = (originNodes: Node[], originEdges: Edge[]) => {
       })
     }
 
+    if (node.data.type === BlockEnum.TextTo3D) {
+      node.data._targetBranches = (node.data as TextTo3DNodeType).classes.map((topic) => {
+        return topic
+      })
+    }
+
     if (node.data.type === BlockEnum.Iteration) {
       const iterationNodeData = node.data as IterationNodeType
       iterationNodeData._children = iterationNodeMap[node.id] || []
@@ -378,6 +385,7 @@ export const canRunBySingle = (nodeType: BlockEnum) => {
     || nodeType === BlockEnum.Code
     || nodeType === BlockEnum.TemplateTransform
     || nodeType === BlockEnum.QuestionClassifier
+    || nodeType === BlockEnum.TextTo3D
     || nodeType === BlockEnum.HttpRequest
     || nodeType === BlockEnum.Tool
     || nodeType === BlockEnum.ParameterExtractor

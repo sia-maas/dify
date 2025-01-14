@@ -5,6 +5,7 @@ import AnswerDefault from './nodes/answer/default'
 import LLMDefault from './nodes/llm/default'
 import KnowledgeRetrievalDefault from './nodes/knowledge-retrieval/default'
 import QuestionClassifierDefault from './nodes/question-classifier/default'
+import TextTo3DDefault from './nodes/text-to-3d/default'
 import IfElseDefault from './nodes/if-else/default'
 import CodeDefault from './nodes/code/default'
 import TemplateTransformDefault from './nodes/template-transform/default'
@@ -127,6 +128,15 @@ export const NODES_EXTRA_DATA: Record<BlockEnum, NodesExtraData> = {
     getAvailablePrevNodes: QuestionClassifierDefault.getAvailablePrevNodes,
     getAvailableNextNodes: QuestionClassifierDefault.getAvailableNextNodes,
     checkValid: QuestionClassifierDefault.checkValid,
+  },
+  [BlockEnum.TextTo3D]: {
+    author: 'SIA',
+    about: '',
+    availablePrevNodes: [],
+    availableNextNodes: [],
+    getAvailablePrevNodes: TextTo3DDefault.getAvailablePrevNodes,
+    getAvailableNextNodes: TextTo3DDefault.getAvailableNextNodes,
+    checkValid: TextTo3DDefault.checkValid,
   },
   [BlockEnum.HttpRequest]: {
     author: 'Dify',
@@ -285,6 +295,14 @@ export const NODES_INITIAL_DATA = {
     topics: [],
     ...QuestionClassifierDefault.defaultValue,
   },
+  [BlockEnum.TextTo3D]: {
+    type: BlockEnum.TextTo3D,
+    title: '',
+    desc: '',
+    query_variable_selector: [],
+    topics: [],
+    ...TextTo3DDefault.defaultValue,
+  },
   [BlockEnum.HttpRequest]: {
     type: BlockEnum.HttpRequest,
     title: '',
@@ -387,6 +405,7 @@ export const RETRIEVAL_OUTPUT_STRUCT = `{
 export const SUPPORT_OUTPUT_VARS_NODE = [
   BlockEnum.Start, BlockEnum.LLM, BlockEnum.KnowledgeRetrieval, BlockEnum.Code, BlockEnum.TemplateTransform,
   BlockEnum.HttpRequest, BlockEnum.Tool, BlockEnum.VariableAssigner, BlockEnum.VariableAggregator, BlockEnum.QuestionClassifier,
+  BlockEnum.TextTo3D,
   BlockEnum.ParameterExtractor, BlockEnum.Iteration,
   BlockEnum.DocExtractor, BlockEnum.ListFilter,
 ]
@@ -413,6 +432,13 @@ export const TEMPLATE_TRANSFORM_OUTPUT_STRUCT: Var[] = [
 ]
 
 export const QUESTION_CLASSIFIER_OUTPUT_STRUCT = [
+  {
+    variable: 'class_name',
+    type: VarType.string,
+  },
+]
+
+export const TEXT_TO_3D_OUTPUT_STRUCT = [
   {
     variable: 'class_name',
     type: VarType.string,

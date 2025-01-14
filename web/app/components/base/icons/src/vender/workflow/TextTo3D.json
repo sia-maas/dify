@@ -1,0 +1,38 @@
+{
+	"icon": {
+		"type": "element",
+		"isRootNode": true,
+		"name": "svg",
+		"attributes": {
+			"width": "14",
+			"height": "14",
+			"viewBox": "0 0 14 14",
+			"fill": "none",
+			"xmlns": "http://www.w3.org/2000/svg"
+		},
+		"children": [
+			{
+				"type": "element",
+				"name": "g",
+				"attributes": {
+					"id": "icons/text-to-3d"
+				},
+				"children": [
+					{
+						"type": "element",
+						"name": "path",
+						"attributes": {
+							"id": "Vector (Stroke)",
+							"fill-rule": "evenodd",
+							"clip-rule": "evenodd",
+							"d": "M6.75 13.5 0.563 11.081V6.75h1.125v3.543L6.75 12.263l5.063 -1.969V6.75h1.125v4.332zm3.938 -3.938h-1.125v-1.35c-1.407 1.182 -3.993 2.25 -6.525 0.113l0.732 -0.844c2.193 1.856 4.275 0.563 5.118 -0.113h-1.575v-1.125h3.375zm2.25 -2.813h-1.125V3.657L6.75 5.739 1.688 3.657V6.75H0.563V2.418L6.75 0l6.188 2.418zm-10.35 -3.938L6.75 4.5l4.163 -1.688L6.75 1.125z",
+							"fill": "currentColor"
+						},
+						"children": []
+					}
+				]
+			}
+		]
+	},
+	"name": "TextTo3D"
+}
