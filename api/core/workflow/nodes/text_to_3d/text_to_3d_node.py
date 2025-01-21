@@ -25,14 +25,12 @@ from models.workflow import WorkflowNodeExecutionStatus
 from .entities import TextTo3DNodeData
 from .exc import InvalidModelTypeError
 from .template_prompts import (
-    QUESTION_CLASSIFIER_ASSISTANT_PROMPT_1,
-    QUESTION_CLASSIFIER_ASSISTANT_PROMPT_2,
-    QUESTION_CLASSIFIER_COMPLETION_PROMPT,
-    QUESTION_CLASSIFIER_SYSTEM_PROMPT,
-    QUESTION_CLASSIFIER_USER_PROMPT_1,
-    QUESTION_CLASSIFIER_USER_PROMPT_2,
-    QUESTION_CLASSIFIER_USER_PROMPT_3,
+    QUESTION_3D_ASSISTANT_PROMPT_1,
+    QUESTION_3D_COMPLETION_PROMPT,
+    QUESTION_3D_SYSTEM_PROMPT,
+    QUESTION_3D_USER_PROMPT_1,
 )
+import requests
 
 
 class TextTo3DNode(LLMNode):
@@ -42,10 +40,16 @@ class TextTo3DNode(LLMNode):
     def _run(self):
         node_data = cast(TextTo3DNodeData, self.node_data)
         variable_pool = self.graph_runtime_state.variable_pool
+        
+        #配置参数应该从大模型配置中获取
+        token = "api-75220322-0960-4e55-b72d-02286bf183c7"
+        url = "http://127.0.0.1:5771"
+        
+        # 暂时从原来节点的变量中获取需要的参数
+        query = node_data.classes[0].name
+        output_format = node_data.classes[1].name
 
         # extract variables
-        variable = variable_pool.get(node_data.query_variable_selector) if node_data.query_variable_selector else None
-        query = variable.value if variable else None
         variables = {"query": query}
         # fetch model config
         model_instance, model_config = self._fetch_model_config(node_data.model)
@@ -54,10 +58,7 @@ class TextTo3DNode(LLMNode):
             node_data_memory=node_data.memory,
             model_instance=model_instance,
         )
-        # fetch instruction
-        node_data.instruction = node_data.instruction or ""
-        node_data.instruction = variable_pool.convert_template(node_data.instruction).text
-
+        
         files = (
             self._fetch_files(
                 selector=node_data.vision.configs.variable_selector,
@@ -110,19 +111,10 @@ class TextTo3DNode(LLMNode):
                     usage = event.usage
                     finish_reason = event.finish_reason
                     break
-
-            category_name = node_data.classes[0].name
-            category_id = node_data.classes[0].id
-            result_text_json = parse_and_check_json_markdown(result_text, [])
-            # result_text_json = json.loads(result_text.strip('```JSON\n'))
-            if "category_name" in result_text_json and "category_id" in result_text_json:
-                category_id_result = result_text_json["category_id"]
-                classes = node_data.classes
-                classes_map = {class_.id: class_.name for class_ in classes}
-                category_ids = [_class.id for _class in classes]
-                if category_id_result in category_ids:
-                    category_name = classes_map[category_id_result]
-                    category_id = category_id_result
+            
+            outputs = self._generate_3d(url, result_text, token, output_format)
+            
+            #需要把3D部分的消耗加入进来
             process_data = {
                 "model_mode": model_config.mode,
                 "prompts": PromptMessageUtil.prompt_messages_to_prompt_for_saving(
@@ -131,14 +123,12 @@ class TextTo3DNode(LLMNode):
                 "usage": jsonable_encoder(usage),
                 "finish_reason": finish_reason,
             }
-            outputs = {"class_name": category_name, "class_id": category_id}
 
             return NodeRunResult(
                 status=WorkflowNodeExecutionStatus.SUCCEEDED,
                 inputs=variables,
                 process_data=process_data,
                 outputs=outputs,
-                edge_source_handle=category_id,
                 metadata={
                     NodeRunMetadataKey.TOTAL_TOKENS: usage.total_tokens,
                     NodeRunMetadataKey.TOTAL_PRICE: usage.total_price,
@@ -195,6 +185,25 @@ class TextTo3DNode(LLMNode):
         :return:
         """
         return {"type": "text-to-3d", "config": {"instructions": ""}}
+    
+    def _generate_3d(
+        self,
+        url : str,
+        prompt : str,
+        token : str,
+        output_format : str
+    ) -> str:
+        header = {
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Connection": "keep-alive",
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36"
+        }
+        request_url = url + "/text_to_cad?prompt=" + prompt + "&token=" + token + "&file_export_format=" + output_format
+        http_result = requests.get(request_url, json={}, headers=header)
+        return http_result.text
 
     def _calculate_rest_token(
         self,
@@ -248,12 +257,6 @@ class TextTo3DNode(LLMNode):
         max_token_limit: int = 2000,
     ):
         model_mode = ModelMode.value_of(node_data.model.mode)
-        classes = node_data.classes
-        categories = []
-        for class_ in classes:
-            category = {"category_id": class_.id, "category_name": class_.name}
-            categories.append(category)
-        instruction = node_data.instruction or ""
         input_text = query
         memory_str = ""
         if memory:
@@ -264,43 +267,23 @@ class TextTo3DNode(LLMNode):
         prompt_messages: list[LLMNodeChatModelMessage] = []
         if model_mode == ModelMode.CHAT:
             system_prompt_messages = LLMNodeChatModelMessage(
-                role=PromptMessageRole.SYSTEM, text=QUESTION_CLASSIFIER_SYSTEM_PROMPT.format(histories=memory_str)
+                role=PromptMessageRole.SYSTEM, text=QUESTION_3D_SYSTEM_PROMPT.format(histories=memory_str)
             )
             prompt_messages.append(system_prompt_messages)
             user_prompt_message_1 = LLMNodeChatModelMessage(
-                role=PromptMessageRole.USER, text=QUESTION_CLASSIFIER_USER_PROMPT_1
+                role=PromptMessageRole.USER, text=QUESTION_3D_USER_PROMPT_1
             )
             prompt_messages.append(user_prompt_message_1)
             assistant_prompt_message_1 = LLMNodeChatModelMessage(
-                role=PromptMessageRole.ASSISTANT, text=QUESTION_CLASSIFIER_ASSISTANT_PROMPT_1
+                role=PromptMessageRole.ASSISTANT, text=QUESTION_3D_ASSISTANT_PROMPT_1
             )
             prompt_messages.append(assistant_prompt_message_1)
-            user_prompt_message_2 = LLMNodeChatModelMessage(
-                role=PromptMessageRole.USER, text=QUESTION_CLASSIFIER_USER_PROMPT_2
-            )
-            prompt_messages.append(user_prompt_message_2)
-            assistant_prompt_message_2 = LLMNodeChatModelMessage(
-                role=PromptMessageRole.ASSISTANT, text=QUESTION_CLASSIFIER_ASSISTANT_PROMPT_2
-            )
-            prompt_messages.append(assistant_prompt_message_2)
-            user_prompt_message_3 = LLMNodeChatModelMessage(
-                role=PromptMessageRole.USER,
-                text=QUESTION_CLASSIFIER_USER_PROMPT_3.format(
-                    input_text=input_text,
-                    categories=json.dumps(categories, ensure_ascii=False),
-                    classification_instructions=instruction,
-                ),
-            )
-            prompt_messages.append(user_prompt_message_3)
             return prompt_messages
         elif model_mode == ModelMode.COMPLETION:
             return LLMNodeCompletionModelPromptTemplate(
-                text=QUESTION_CLASSIFIER_COMPLETION_PROMPT.format(
+                text=QUESTION_3D_COMPLETION_PROMPT.format(
                     histories=memory_str,
                     input_text=input_text,
-                    categories=json.dumps(categories),
-                    classification_instructions=instruction,
-                    ensure_ascii=False,
                 )
             )
 
